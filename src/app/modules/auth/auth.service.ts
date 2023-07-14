@@ -11,10 +11,10 @@ import { jwtHelpers } from '../../../helpers/jwtHelpers';
 import { Secret } from 'jsonwebtoken';
 
 const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
-  const { phoneNumber, password } = payload;
+  const { email, password } = payload;
 
   // Check user is exist
-  const isUserExist = await User.isUserExist(phoneNumber);
+  const isUserExist = await User.isUserExist(email);
 
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
@@ -28,15 +28,15 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   }
 
   //create access token & refresh token
-  const { _id, phoneNumber: userPhoneNumber, role } = isUserExist;
+  const { _id, email: useremail } = isUserExist;
   const accessToken = jwtHelpers.createToken(
-    { _id, userPhoneNumber, role },
+    { _id, useremail },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );
 
   const refreshToken = jwtHelpers.createToken(
-    { _id, userPhoneNumber, role },
+    { _id, useremail },
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string
   );
@@ -57,11 +57,11 @@ const refreshAccessToken = async (
   );
 
   // Retrieve the user information from the refresh token
-  const { _id, userPhoneNumber, role } = decodedToken;
+  const { _id, useremail } = decodedToken;
 
   // Generate a new access token
   const accessToken = jwtHelpers.createToken(
-    { _id, userPhoneNumber, role },
+    { _id, useremail },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );
