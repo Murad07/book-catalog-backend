@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
-import { Cow } from '../cow/cow.model';
+import { Book } from '../book/book.model';
 import { User } from '../user/user.model';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
@@ -11,7 +11,7 @@ import ApiError from '../../../errors/ApiError';
 import mongoose from 'mongoose';
 
 const createOrder = async (order: IOrder): Promise<IOrder | null> => {
-  const { cow, buyer } = order;
+  const { book, buyer } = order;
 
   const buyerUser = await User.findById(buyer);
 
@@ -20,28 +20,28 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
     session.startTransaction();
 
     if (buyerUser) {
-      const cowData: any = await Cow.findById(cow).populate('seller');
-      const sellerUser = await User.findById(cowData.seller);
+      const bookData: any = await Book.findById(book).populate('seller');
+      const sellerUser = await User.findById(bookData.seller);
 
-      // Check buyer have enough budget to buy cow
-      if (buyerUser.budget < cowData.price) {
+      // Check buyer have enough budget to buy book
+      if (buyerUser.budget < bookData.price) {
         throw new ApiError(
           httpStatus.BAD_REQUEST,
-          'Not enough money to buy this cow'
+          'Not enough money to buy this book'
         );
-      } else if (cowData.label === 'sold out') {
+      } else if (bookData.label === 'sold out') {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Not available for sell');
       } else {
-        const updatedCow = await Cow.findByIdAndUpdate(cow, {
+        const updatedBook = await Book.findByIdAndUpdate(book, {
           label: 'sold out',
         });
-        if (!updatedCow) {
-          throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to update cow');
+        if (!updatedBook) {
+          throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to update book');
         }
       }
 
       if (sellerUser) {
-        sellerUser.income += cowData.price;
+        sellerUser.income += bookData.price;
         const updatedSellerUser = await sellerUser.updateOne({
           income: sellerUser.income,
         });
@@ -50,7 +50,7 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
         }
       }
 
-      buyerUser.budget -= cowData.price;
+      buyerUser.budget -= bookData.price;
       const updatedBuyerUser = await buyerUser.updateOne({
         budget: buyerUser.budget,
       });
@@ -69,10 +69,10 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
 
     // Populate all data are updated
     const orderData = await Order.findById(newOrder.id)
-      .populate('cow')
+      .populate('book')
       .populate('buyer')
       .populate({
-        path: 'cow',
+        path: 'book',
         populate: {
           path: 'seller',
         },
@@ -105,10 +105,10 @@ const getAllOrders = async (
     countQuery = countQuery.where('buyer', userId);
 
     result = await query
-      .populate('cow')
+      .populate('book')
       .populate('buyer')
       .populate({
-        path: 'cow',
+        path: 'book',
         populate: {
           path: 'seller',
         },
@@ -121,23 +121,23 @@ const getAllOrders = async (
       throw new ApiError(httpStatus.NOT_FOUND, 'No Order found !');
     }
   } else if (userRole === 'seller') {
-    const cows = await Cow.find({ seller: userId });
+    const books = await Book.find({ seller: userId });
 
-    if (cows.length > 0) {
+    if (books.length > 0) {
       let orders: any = [];
 
-      // Fetch orders for each cow
-      for (const cow of cows) {
-        const cowOrders = await Order.find({ cow: cow._id })
-          .populate('cow')
+      // Fetch orders for each book
+      for (const book of books) {
+        const bookOrders = await Order.find({ book: book._id })
+          .populate('book')
           .populate('buyer')
           .populate({
-            path: 'cow',
+            path: 'book',
             populate: {
               path: 'seller',
             },
           });
-        orders = orders.concat(cowOrders);
+        orders = orders.concat(bookOrders);
       }
 
       result = orders;
@@ -159,10 +159,10 @@ const getAllOrders = async (
 
 const getSingleOrder = async (id: string): Promise<IOrder | null> => {
   const result = await Order.findById(id)
-    .populate('cow')
+    .populate('book')
     .populate('buyer')
     .populate({
-      path: 'cow',
+      path: 'book',
       populate: {
         path: 'seller',
       },

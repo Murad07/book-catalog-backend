@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const createOrderZodSchema = z.object({
   body: z.object({
-    cow: z.string(),
+    book: z.string(),
     buyer: z.string(),
   }),
 });
