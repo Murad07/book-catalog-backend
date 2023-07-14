@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post(
   '/create-book',
-  // auth(ENUM_USER_ROLE.SELLER),
+  auth(ENUM_USER_ROLE.USER),
   validateRequest(BookValidaion.createBookZodSchema),
   BookController.createBook
 );

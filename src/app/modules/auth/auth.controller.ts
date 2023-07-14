@@ -40,11 +40,11 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   );
 
   // Retrieve the user information from the refresh token
-  const { _id, userPhoneNumber, role } = decodedToken;
+  const { _id, userEmail, role } = decodedToken;
 
   // Generate a new access token
   const accessToken = jwtHelpers.createToken(
-    { _id, userPhoneNumber, role },
+    { _id, userEmail, role },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );

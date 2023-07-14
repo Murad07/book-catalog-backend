@@ -28,15 +28,15 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
   }
 
   //create access token & refresh token
-  const { _id, email: useremail } = isUserExist;
+  const { _id, email: userEmail, role } = isUserExist;
   const accessToken = jwtHelpers.createToken(
-    { _id, useremail },
+    { _id, userEmail, role },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );
 
   const refreshToken = jwtHelpers.createToken(
-    { _id, useremail },
+    { _id, userEmail, role },
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string
   );
@@ -57,11 +57,11 @@ const refreshAccessToken = async (
   );
 
   // Retrieve the user information from the refresh token
-  const { _id, useremail } = decodedToken;
+  const { _id, userEmail, role } = decodedToken;
 
   // Generate a new access token
   const accessToken = jwtHelpers.createToken(
-    { _id, useremail },
+    { _id, userEmail, role },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );

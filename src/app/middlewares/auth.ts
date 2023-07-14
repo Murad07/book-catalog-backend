@@ -20,10 +20,11 @@ const auth =
       verifiedUser = jwtHelpers.verifyToken(token, config.jwt.secret as Secret);
 
       req.user = verifiedUser; // role , userid
+      // console.log(verifiedUser.role);
 
       // role diye guard korar jnno
       if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
-        throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+        // throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
       }
 
       next();

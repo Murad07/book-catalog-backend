@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Schema, model } from 'mongoose';
 import { IUser, UserModel } from './user.interface';
+import { role } from './user.constant';
 import bcrypt from 'bcrypt';
 import config from '../../../config';
 
 const userSchema = new Schema<IUser, UserModel>(
   {
+    role: {
+      type: String,
+      enum: role,
+      required: true,
+    },
     password: {
       type: String,
       required: true,
@@ -29,9 +35,6 @@ const userSchema = new Schema<IUser, UserModel>(
       unique: true,
       required: true,
     },
-    role: {
-      type: String,
-    },
   },
   {
     timestamps: true,
@@ -44,8 +47,8 @@ const userSchema = new Schema<IUser, UserModel>(
 // Check user is exist or not
 userSchema.statics.isUserExist = async function (
   email: string
-): Promise<Pick<IUser, '_id' | 'email' | 'password'> | null> {
-  return await User.findOne({ email }, { email: 1, password: 1 });
+): Promise<Pick<IUser, '_id' | 'email' | 'password' | 'role'> | null> {
+  return await User.findOne({ email }, { email: 1, password: 1, role: 1 });
 };
 
 // Check Password Match
