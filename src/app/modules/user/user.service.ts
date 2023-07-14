@@ -15,6 +15,7 @@ const createUser = async (user: IUser): Promise<IUser | null> => {
   if (!user.password) {
     user.password = config.DEFAULT_USER_PASS as string;
   }
+  user.role = 'user';
 
   const newUser = await User.create(user);
   newUser.password = '';
