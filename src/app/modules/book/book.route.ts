@@ -15,12 +15,12 @@ router.post(
 
 router.get(
   '/:id',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SELLER, ENUM_USER_ROLE.BUYER),
+  // auth(ENUM_USER_ROLE.USER),
   BookController.getSingleBook
 );
 router.get(
   '/',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SELLER, ENUM_USER_ROLE.BUYER),
+  // auth(ENUM_USER_ROLE.USER),
   BookController.getAllBooks
 );
 
