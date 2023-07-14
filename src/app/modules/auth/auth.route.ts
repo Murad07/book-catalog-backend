@@ -18,6 +18,8 @@ router.post(
   UserController.createUser
 );
 
+router.post('/logout', AuthController.logoutUser); // Add this route for logout
+
 router.post('/refresh-token', AuthController.refreshToken);
 
 export const AuthRoutes = router;
