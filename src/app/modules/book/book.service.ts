@@ -77,7 +77,7 @@ const getAllBooks = async (
 };
 
 const getSingleBook = async (id: string): Promise<IBook | null> => {
-  const result = await Book.findById(id).populate('seller');
+  const result = await Book.findById(id).populate('addedBy');
   return result;
 };
 
