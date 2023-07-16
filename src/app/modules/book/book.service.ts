@@ -104,14 +104,17 @@ const updateBook = async (
 
 const deleteBook = async (
   id: string,
-  sellerId: string
+  addedBy: string
 ): Promise<IBook | null> => {
-  const isExist = await Book.findOne({ _id: id, seller: sellerId });
+  const isExist = await Book.findOne({ _id: id, addedBy: addedBy });
 
   if (!isExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Book not found !');
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'Book not Found or You Do not have permission!'
+    );
   }
-  const result = await Book.findByIdAndDelete(id).populate('seller');
+  const result = await Book.findByIdAndDelete(id).populate('addedBy');
   return result;
 };
 
