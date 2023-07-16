@@ -12,7 +12,7 @@ import { RequestHandler } from 'express-serve-static-core';
 const createBook: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const { ...bookData } = req.body;
-    const result = await BookService.createBook(bookData);
+    const result = await BookService.createBook(bookData, req?.user?._id);
 
     sendResponse<IBook>(res, {
       statusCode: httpStatus.OK,

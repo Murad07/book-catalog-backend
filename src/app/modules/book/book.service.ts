@@ -9,8 +9,14 @@ import ApiError from '../../../errors/ApiError';
 import { bookSearchableFields } from './book.constant';
 import { IBook, IBookFilters } from './book.interface';
 import { Book } from './book.model';
+import { IUser } from '../user/user.interface';
+import { Types } from 'mongoose';
 
-const createBook = async (book: IBook): Promise<IBook | null> => {
+const createBook = async (
+  book: IBook,
+  addedBy: IUser | Types.ObjectId
+): Promise<IBook | null> => {
+  book.addedBy = addedBy;
   const newBook = await Book.create(book);
   return newBook;
 };
