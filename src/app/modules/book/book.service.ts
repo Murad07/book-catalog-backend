@@ -84,9 +84,9 @@ const getSingleBook = async (id: string): Promise<IBook | null> => {
 const updateBook = async (
   id: string,
   payload: Partial<IBook>,
-  sellerId: string
+  addedBy: string
 ): Promise<IBook | null> => {
-  const isExist = await Book.findOne({ _id: id, seller: sellerId });
+  const isExist = await Book.findOne({ _id: id, addedBy: addedBy });
 
   if (!isExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Book not found !');
