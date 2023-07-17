@@ -13,11 +13,7 @@ router.post(
   ReviewController.createReview
 );
 
-router.get('/:id', ReviewController.getSingleReview);
-router.get(
-  '/',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.SELLER),
-  ReviewController.getAllReviews
-);
+// router.get('/:id', ReviewController.getSingleReview);
+router.get('/:id', ReviewController.getAllReviews);
 
 export const ReviewRoutes = router;

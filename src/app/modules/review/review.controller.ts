@@ -27,8 +27,7 @@ const getAllReviews = catchAsync(async (req: Request, res: Response) => {
 
   const result = await ReviewService.getAllReviews(
     paginationOptions,
-    req?.user?._id,
-    req?.user?.role
+    req.params.id
   );
 
   sendResponse<IReview[]>(res, {
