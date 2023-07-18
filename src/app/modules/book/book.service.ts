@@ -89,7 +89,10 @@ const updateBook = async (
   const isExist = await Book.findOne({ _id: id, addedBy: addedBy });
 
   if (!isExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Book not found !');
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'You Do not have no Edit permission!'
+    );
   }
 
   const { ...bookData } = payload;
@@ -111,7 +114,7 @@ const deleteBook = async (
   if (!isExist) {
     throw new ApiError(
       httpStatus.NOT_FOUND,
-      'Book not Found or You Do not have permission!'
+      'You Do not have Delete permission!'
     );
   }
   const result = await Book.findByIdAndDelete(id).populate('addedBy');
