@@ -23,31 +23,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserService = void 0;
-// import httpStatus from 'http-status';
-const index_1 = __importDefault(require("../../../config/index"));
-const user_model_1 = require("./user.model");
+exports.BookService = void 0;
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
-const user_constant_1 = require("./user.constant");
 const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
-const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    // default password
-    if (!user.password) {
-        user.password = index_1.default.DEFAULT_USER_PASS;
-    }
-    user.role = 'user';
-    const newUser = yield user_model_1.User.create(user);
-    newUser.password = '';
-    return newUser;
+const book_constant_1 = require("./book.constant");
+const book_model_1 = require("./book.model");
+const createBook = (book, addedBy) => __awaiter(void 0, void 0, void 0, function* () {
+    book.addedBy = addedBy;
+    const newBook = yield book_model_1.Book.create(book);
+    return newBook;
 });
-const getAllUsers = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllBooks = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { searchTerm } = filters, filtersData = __rest(filters, ["searchTerm"]);
     const { page, limit, skip, sortBy, sortOrder } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
     const andConditions = [];
     if (searchTerm) {
         andConditions.push({
-            $or: user_constant_1.userSearchableFields.map(field => ({
+            $or: book_constant_1.bookSearchableFields.map(field => ({
                 [field]: {
                     $regex: searchTerm,
                     $options: 'i',
@@ -67,11 +60,12 @@ const getAllUsers = (filters, paginationOptions) => __awaiter(void 0, void 0, vo
         sortConditions[sortBy] = sortOrder;
     }
     const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
-    const result = yield user_model_1.User.find(whereConditions)
+    const result = yield book_model_1.Book.find(whereConditions)
+        .populate('addedBy')
         .sort(sortConditions)
         .skip(skip)
         .limit(limit);
-    const total = yield user_model_1.User.countDocuments(whereConditions);
+    const total = yield book_model_1.Book.countDocuments(whereConditions);
     return {
         meta: {
             page,
@@ -81,30 +75,34 @@ const getAllUsers = (filters, paginationOptions) => __awaiter(void 0, void 0, vo
         data: result,
     };
 });
-const getSingleUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.findById(id);
+const getSingleBook = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield book_model_1.Book.findById(id).populate('addedBy');
     return result;
 });
-const updateUser = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const isExist = yield user_model_1.User.findById(id);
+const updateBook = (id, payload, addedBy) => __awaiter(void 0, void 0, void 0, function* () {
+    const isExist = yield book_model_1.Book.findOne({ _id: id, addedBy: addedBy });
     if (!isExist) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found !');
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'You Do not have no Edit permission!');
     }
-    const userData = __rest(payload, []);
-    const updatedUserData = Object.assign({}, userData);
-    const result = yield user_model_1.User.findByIdAndUpdate(id, updatedUserData, {
+    const bookData = __rest(payload, []);
+    const updatedBookData = Object.assign({}, bookData);
+    const result = yield book_model_1.Book.findByIdAndUpdate(id, updatedBookData, {
         new: true,
     });
     return result;
 });
-const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.findByIdAndDelete(id);
+const deleteBook = (id, addedBy) => __awaiter(void 0, void 0, void 0, function* () {
+    const isExist = yield book_model_1.Book.findOne({ _id: id, addedBy: addedBy });
+    if (!isExist) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'You Do not have Delete permission!');
+    }
+    const result = yield book_model_1.Book.findByIdAndDelete(id).populate('addedBy');
     return result;
 });
-exports.UserService = {
-    createUser,
-    getSingleUser,
-    getAllUsers,
-    updateUser,
-    deleteUser,
+exports.BookService = {
+    createBook,
+    getAllBooks,
+    getSingleBook,
+    updateBook,
+    deleteBook,
 };

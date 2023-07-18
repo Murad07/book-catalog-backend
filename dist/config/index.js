@@ -12,7 +12,6 @@ exports.default = {
     port: process.env.PORT,
     database_url: process.env.DATABASE_URL,
     DEFAULT_USER_PASS: process.env.DEFAULT_USER_PASS,
-    DEFAULT_COW_LABEL: process.env.DEFAULT_COW_LABEL,
     bycrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
     jwt: {
         secret: process.env.JWT_SECRET,

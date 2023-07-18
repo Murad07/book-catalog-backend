@@ -19,9 +19,9 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const user_model_1 = require("../user/user.model");
 const jwtHelpers_1 = require("../../../helpers/jwtHelpers");
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const { phoneNumber, password } = payload;
+    const { email, password } = payload;
     // Check user is exist
-    const isUserExist = yield user_model_1.User.isUserExist(phoneNumber);
+    const isUserExist = yield user_model_1.User.isUserExist(email);
     if (!isUserExist) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
     }
@@ -30,14 +30,26 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'Password is incorrect');
     }
     //create access token & refresh token
-    const { _id, phoneNumber: userPhoneNumber, role } = isUserExist;
-    const accessToken = jwtHelpers_1.jwtHelpers.createToken({ _id, userPhoneNumber, role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
-    const refreshToken = jwtHelpers_1.jwtHelpers.createToken({ _id, userPhoneNumber, role }, config_1.default.jwt.refresh_secret, config_1.default.jwt.refresh_expires_in);
+    const { _id, email: userEmail, role } = isUserExist;
+    const accessToken = jwtHelpers_1.jwtHelpers.createToken({ _id, userEmail, role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
+    const refreshToken = jwtHelpers_1.jwtHelpers.createToken({ _id, userEmail, role }, config_1.default.jwt.refresh_secret, config_1.default.jwt.refresh_expires_in);
     return {
         accessToken,
         refreshToken,
     };
 });
+const refreshAccessToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+    // Verify the refresh token
+    const decodedToken = jwtHelpers_1.jwtHelpers.verifyToken(refreshToken, config_1.default.jwt.refresh_secret);
+    // Retrieve the user information from the refresh token
+    const { _id, userEmail, role } = decodedToken;
+    // Generate a new access token
+    const accessToken = jwtHelpers_1.jwtHelpers.createToken({ _id, userEmail, role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
+    return {
+        accessToken,
+    };
+});
 exports.AuthService = {
     loginUser,
+    refreshAccessToken,
 };

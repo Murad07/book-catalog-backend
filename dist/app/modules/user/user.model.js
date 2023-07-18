@@ -29,34 +29,22 @@ const userSchema = new mongoose_1.Schema({
         required: true,
         select: false,
     },
-    name: {
-        type: {
-            firstName: {
-                type: String,
-                required: true,
-            },
-            lastName: {
-                type: String,
-                required: true,
-            },
-        },
-        required: true,
-    },
-    phoneNumber: {
+    // name: {
+    //   type: {
+    //     firstName: {
+    //       type: String,
+    //       required: true,
+    //     },
+    //     lastName: {
+    //       type: String,
+    //       required: true,
+    //     },
+    //   },
+    //   required: true,
+    // },
+    email: {
         type: String,
         unique: true,
-        required: true,
-    },
-    address: {
-        type: String,
-        required: true,
-    },
-    budget: {
-        type: Number,
-        required: true,
-    },
-    income: {
-        type: Number,
         required: true,
     },
 }, {
@@ -66,9 +54,9 @@ const userSchema = new mongoose_1.Schema({
     },
 });
 // Check user is exist or not
-userSchema.statics.isUserExist = function (phoneNumber) {
+userSchema.statics.isUserExist = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield exports.User.findOne({ phoneNumber }, { phoneNumber: 1, password: 1, role: 1 });
+        return yield exports.User.findOne({ email }, { email: 1, password: 1, role: 1 });
     });
 };
 // Check Password Match

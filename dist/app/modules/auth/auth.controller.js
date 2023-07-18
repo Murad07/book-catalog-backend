@@ -28,6 +28,7 @@ const config_1 = __importDefault(require("../../../config"));
 const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const auth_service_1 = require("./auth.service");
+const jwtHelpers_1 = require("../../../helpers/jwtHelpers");
 const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const loginData = __rest(req.body, []);
     const result = yield auth_service_1.AuthService.loginUser(loginData);
@@ -45,6 +46,34 @@ const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
         data: others,
     });
 }));
+// auth.controller.ts
+const refreshToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const refreshToken = req.cookies.refreshToken;
+    // Verify the refresh token
+    const decodedToken = jwtHelpers_1.jwtHelpers.verifyToken(refreshToken, config_1.default.jwt.refresh_secret);
+    // Retrieve the user information from the refresh token
+    const { _id, userEmail, role } = decodedToken;
+    // Generate a new access token
+    const accessToken = jwtHelpers_1.jwtHelpers.createToken({ _id, userEmail, role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
+    // Send the new access token in the response
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: 'New access token generated successfully !',
+        data: { accessToken },
+    });
+}));
+const logoutUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Clear the refresh token cookie
+    res.clearCookie('refreshToken');
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User logged out successfully!',
+    });
+}));
 exports.AuthController = {
     loginUser,
+    refreshToken,
+    logoutUser,
 };

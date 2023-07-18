@@ -13,4 +13,6 @@ const auth_controller_1 = require("./auth.controller");
 const router = express_1.default.Router();
 router.post('/login', (0, validateRequest_1.default)(auth_validation_1.AuthValidation.loginZodSchema), auth_controller_1.AuthController.loginUser);
 router.post('/signup', (0, validateRequest_1.default)(user_validation_1.UserValidation.createUserZodSchema), user_controller_1.UserController.createUser);
+router.post('/logout', auth_controller_1.AuthController.logoutUser); // Add this route for logout
+router.post('/refresh-token', auth_controller_1.AuthController.refreshToken);
 exports.AuthRoutes = router;

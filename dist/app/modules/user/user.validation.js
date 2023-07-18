@@ -11,35 +11,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserValidation = void 0;
 const zod_1 = require("zod");
-const user_constant_1 = require("./user.constant");
 const user_model_1 = require("./user.model");
 const createUserZodSchema = zod_1.z
     .object({
     body: zod_1.z
         .object({
         password: zod_1.z.string().optional(),
-        name: zod_1.z.object({
-            firstName: zod_1.z.string({
-                required_error: 'First name is required',
-            }),
-            lastName: zod_1.z.string({
-                required_error: 'Last name is required',
-            }),
+        email: zod_1.z.string({
+            required_error: 'Email is required',
         }),
-        role: zod_1.z.enum([...user_constant_1.role], {
-            required_error: 'Role is required',
-        }),
-        phoneNumber: zod_1.z.string({
-            required_error: 'Phone number is required',
-        }),
-        address: zod_1.z.string({
-            required_error: 'Address is required',
-        }),
-        profileImage: zod_1.z.string().optional(),
     })
-        .refine(value => isUniquePhoneNumber(value.phoneNumber), {
-        message: 'Phone number already exists',
-        path: ['body', 'phoneNumber'],
+        .refine(value => isUniqueemail(value.email), {
+        message: 'Email already exists',
+        path: ['body', 'email'],
     }),
 })
     .refine(value => Object.keys(value.body).length > 0, {
@@ -65,30 +49,19 @@ const updaeUserZodSchema = zod_1.z
                 .optional(),
         })
             .optional(),
-        role: zod_1.z
-            .enum([...user_constant_1.role], {
-            required_error: 'Role is required',
-        })
-            .optional(),
-        phoneNumber: zod_1.z.string({
-            required_error: 'Phone number is required',
+        email: zod_1.z.string({
+            required_error: 'Email is required',
         }),
-        address: zod_1.z
-            .string({
-            required_error: 'Address is required',
-        })
-            .optional(),
-        profileImage: zod_1.z.string().optional(),
     })
         .optional()
         .refine(value => {
-        if (value && value.phoneNumber) {
-            return isUniquePhoneNumber(value.phoneNumber);
+        if (value && value.email) {
+            return isUniqueemail(value.email);
         }
         return true;
     }, {
         message: 'Phone number already exists',
-        path: ['body', 'phoneNumber'],
+        path: ['body', 'email'],
     }),
 })
     .refine(value => { var _a; return Object.keys((_a = value.body) !== null && _a !== void 0 ? _a : {}).length > 0; }, {
@@ -99,9 +72,9 @@ exports.UserValidation = {
     createUserZodSchema,
     updaeUserZodSchema,
 };
-function isUniquePhoneNumber(phoneNumber) {
+function isUniqueemail(email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = yield user_model_1.User.findOne({ phoneNumber });
+        const user = yield user_model_1.User.findOne({ email });
         return user === null;
     });
 }
